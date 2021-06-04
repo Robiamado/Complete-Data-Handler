@@ -1,0 +1,12 @@
+Exit Error List:
+
+0 - "Internal Error 0" - CDH Source code error, to report
+1 - "Index out of range in name"
+2 - "Attempting to modify read only values in name"
+3 - "Invalid argument in + operator at self_name + other_name" - Bad operand assignment (accept only numbers, strings, lists, dicts and cdhs)
+4 - "Range steps exceed range length in name" - Slice has steps exceeding length values
+5 - "Invalid arguments in get method at name"
+6 - "Attempting to set invalid values in name"
+7 - "Attempting to update invalid values at name"
+8 - "No common", index, "found in", self.name, "and", other
+9 - "Invalid index in common operator. Only 'key' and 'val' are accepted inputs."
