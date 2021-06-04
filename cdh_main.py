@@ -1,7 +1,6 @@
 import math
 import traceback
 
-# returns error message and exit with corresponding code (Error codes.txt)
 def error(code, cdh_name, *argv):
     error_starter = "Error :"
     report_site = "..."
@@ -28,7 +27,7 @@ def error(code, cdh_name, *argv):
     else:
         error(0, cdh_name)
     exit(0)
-    
+
 # converts strings to numbers, returns false if not possible
 def str_to_num(str_to_conv, num_type = None):
     if num_type == None:
@@ -43,21 +42,21 @@ def str_to_num(str_to_conv, num_type = None):
                 except:
                     return False
     return str_to_conv
-    
+
 # multiply 2 strings as coloumn/row vector multiplication
 def str_mul(first_str, second_str):
     return_str = ''
     j = 0
     while j < min(len(first_str), len(second_str)):
         return_str = return_str + first_str[j] + second_str[j]
-        j = j + 1
+        j += 1
     if j-1 == len(first_str):
         return_str = return_str + second_str[j:]
     elif j-1 == len(second_str):
         return_str = return_str + first_str[j:]
     return return_str
-    
-# dictionary with id as numerical index as lists and standard operators 
+
+# dictionary with id as numerical index as lists and standard operators
 class cdh(dict):
     def __init__(self, data = None,  *argv, name = None, ro = False,):
         if name == None:
@@ -237,7 +236,7 @@ class cdh(dict):
                         self.update({key : set_value})
                     break
 
-    def __add__(self, other):
+    def __add__(self, other): # Automatic number to string cast on direct sum
         if type(other) in [int, float, complex, str, list, dict, cdh]:
             i = 0
             return_val = cdh()
@@ -263,7 +262,7 @@ class cdh(dict):
                             return_val.update({self.get("key", i) : self.get("val", i) + other_i})
                         elif type(self.get("val", i)) is str:
                             if str_to_num(self.get("val", i)):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) + other_i})
+                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) + other})
                             else:
                                 return_val.update({self.get("key", i) : self.get("val", i) + str(other_i)})
                         else:
@@ -295,7 +294,7 @@ class cdh(dict):
         else:
             error(3, self.name, "+", other_name)
 
-    def __sub__(self, other):
+    def __sub__(self, other): # Automatic number to string cast on direct subtraction
         if type(other) in [int, float, complex, str, list, dict, cdh]:
             i = 0
             return_val = cdh()
@@ -353,7 +352,7 @@ class cdh(dict):
         else:
             error(3, self.name, "-", other_name)
 
-    def __mul__(self, other):
+    def __mul__(self, other): # Automatic number to string cast on direct multiplication
         if type(other) in [int, float, complex, str, list, dict, cdh]:
             i = 0
             return_val = cdh()
@@ -411,7 +410,7 @@ class cdh(dict):
         else:
             error(3, self.name, "*", other_name)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other): # Automatic number to string cast on direct division
         if type(other) in [int, float, complex, str, list, dict, cdh]:
             i = 0
             return_val = cdh()
@@ -437,7 +436,7 @@ class cdh(dict):
                             return_val.update({self.get("key", i) : self.get("val", i) / other_i})
                         elif type(self.get("val", i)) is str:
                             if str_to_num(self.get("val", i)):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) / other})
+                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) / other_i})
                             else:
                                 return_val.update({self.get("key", i) : self.get("val", i).split(str(other_i))[0] + self.get("val", i).split(str(other_i))[1]})
                         else:
@@ -550,7 +549,7 @@ class cdh(dict):
                 while i < len(value):
                     super(cdh, self).update({str(len(self.id)) : value[i]})
                     self.id.append(len(self.id))
-                    i = i + 1
+                    i += 1
             elif type(value) in [dict, cdh]:
                 for key in value.keys():
                     if key not in self.keys():
