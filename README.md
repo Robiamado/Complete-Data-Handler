@@ -2,7 +2,7 @@
 
 *Introduction*
 
-Complete data handler is a Python class that merges numbers (int, float, complex), strings, lists and dictionaries. It can store and operate with those data types as a whole, using simple and intuitive rules listed below. CDH has been created to suppress the need of operating with dictionaries and lists as separate entities and to be able to call \_\_getitem\_\_ and \_\_setitem\_\_ operators (square brakets) with either an int, a slice or a string as argument. To do so, it has been introduced the concept of ID which is list indexing transposed to dictionaries. As matter of fact CDH structures store an ID, which is always a positive integer ; a Key, which is always a string, and a Value for each element. It has also been introduced a new |eq| operator infix of set method, that allows to assign an other number, string, list, dict or cdh to an existing cdh without aliasing. Recalling thet the latter is given by = operator. The new get method allows to retrive keys and values using IDs, pop method has been updated to handle IDs and a ro method is used to set a cdh to read only state. Union can be performed using update while intersection is done with common method, both returns the result of the operation and save it to the object calling it.
+Complete data handler is a Python class that merges numbers (int, float, complex), strings, lists and dictionaries. It can store and operate with those data types as a whole, using simple and intuitive rules listed below. CDH has been created to suppress the need of operating with dictionaries and lists as separate entities and to be able to call \_\_getitem\_\_ and \_\_setitem\_\_ operators (square brakets) with either an int, a slice or a string as argument. To do so, it has been introduced the concept of ID which is list indexing transposed to dictionaries. As matter of fact CDH structures store an ID, which is always a positive integer ; a Key, which is always a string, and a Value for each element. It has also been introduced a new set method, that allows to assign a number, string, list, dict or cdh to an existing cdh without aliasing. Recalling thet the latter is given by = operator. The new get method allows to retrive keys and values using IDs, pop method has been updated to handle IDs and a ro method is used to set a cdh to read only state. Union can be performed using update while intersection is done with common method, both returns the result of the operation and save it to the object calling it.
 
 *Requirements*
 
@@ -21,9 +21,6 @@ copy cdh\_main.py in your root project folder
 *-  Class import:*
 
 from cdh\_main import cdh
-
-
-
 
 *Methods*
 
@@ -49,8 +46,6 @@ e = cdh(d, {'a': 'b'}) → d = {(0) zero: 0, (1) 1: one, (2) three: 3, (3) a: b}
 
 Both used as square braket operator [ ] can be used in the most intuitive way, by calling it with an integer ID or a string Key. If used with ID argument it will return or modify the correspond dictionary while if used with Key argument it will return or modify the corresponding Value.
 
-
-
 Example:
 
 a = cdh(1,2)
@@ -64,7 +59,6 @@ a[0] = 0
 a['1'] = 1
 
 print(a) → {(0) 0: 0, (1) 1: 1}
-
 
 Hence using square brakets to set a value with an integer ID one is able to change a dictionary element, thus both Key and the corresponding Value. To do so it is mandatory that the value is a dictionary or a cdh with exactly one element.
 
@@ -114,6 +108,60 @@ Any string which is convertible to a numerical value gets automatically converte
 
 Further examples are given in examples.py file.
 
+**get**
+
+Returns dictionaries, keys or values from a chd given a fixed ID.
+
+Example
+
+fruits = cdh({0 : 'apple', 1 : 'banana', 2 : 'pear'})
+
+print(fruits.get(1)) → {'1': 'banana'}
+
+print(fruits.get('key')) →  ['0', '1', '2']
+
+print(fruits.get('val')) →  ['apple', 'banana', 'pear']
+
+print(fruits.get('key', 1)) →  1
+
+print(fruits.get('val', 1)) →  banana
+
+**set**
+
+Used to assign a variable without aliasing. Any existing cdh can be set equal to any number, string, list, dictionary or cdh.
+
+Example
+
+a = cdh(2)
+
+b = cdh('a')
+
+a.set(b)
+
+print('a is b =', a is b,', a =', a, 'b =', b) → a is b = False , a = {(0) 0: a} b = {(0) 0: a}
+
+a.set(2)
+
+a = b
+
+print('a is b =', a is b,', a =', a, 'b =', b) → a is b = True , a = {(0) 0: a} b = {(0) 0: a}
+
+**pop**
+
+Used to remove an element from a cdh. The element to be removed can be detected using a key or an ID.
+
+Example
+
+fruits = cdh({0 : 'apple', 1 : 'banana', 2 : 'pear'})
+
+fruits.pop(1)
+
+print(fruits) → {(0) '0' : 'apple', (1) '2' : 'pear'}
+
+fruits.pop('0')
+
+print(fruits) → {(0) '2' : 'pear'}
+
 **update**
 
 The update method is the usual dictionary method with the cdh conversion of each of the most commonly used types (numbers, strings, lists, dictionaries). It modify the calling object to a cdh which is the matematical join of the two cdhs. As usual if two elements have the same key, the calling object’s value gets replaced by the argument’s value while the key remains unchanged.
@@ -145,9 +193,6 @@ IF b.common(a) -> b = {(0) zero: 0}
 IF a.common(b, 'key') -> a = {(0) zero: no zero}
 
 IF a.common(b, 'val') -> a = {(0) two: 1}
-
-
-
 
 **ro**
 
