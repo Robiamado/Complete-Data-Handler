@@ -60,7 +60,6 @@ def str_mul(first_str, second_str):
 # dictionary with id as numerical index as lists and standard operators 
 class cdh(dict):
     def __init__(self, data = None,  *argv, name = None, ro = False,):
-        globals()["eq"] = infix(lambda l,m: l.set(m))
         if name == None:
             (filename,line_number,function_name,text) = traceback.extract_stack()[-2]
             self.name = text[:text.find("=")].strip()
