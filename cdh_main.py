@@ -264,7 +264,7 @@ class cdh(dict):
                             return_val.update({self.get("key", i) : self.get("val", i) + other_i})
                         elif type(self.get("val", i)) is str:
                             if str_to_num(self.get("val", i)):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) + other})
+                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) + other_i})
                             else:
                                 return_val.update({self.get("key", i) : self.get("val", i) + str(other_i)})
                         else:
