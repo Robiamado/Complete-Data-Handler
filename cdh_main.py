@@ -473,7 +473,7 @@ class cdh(dict):
     def get(self, index = None, id = None):
         if index == None:
             if id != None:
-                if type(id) == int and id <= len(self.id) and id >= -len(self.id):
+                if type(id) is int and id <= len(self.id) and id >= -len(self.id):
                     return {list(self[id].keys())[0] : list(self[id].values())[0]}
                 else:
                     error(5, self.name)
