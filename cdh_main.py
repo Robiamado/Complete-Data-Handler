@@ -1,656 +1,415 @@
-import math
-import traceback
-
-def error(code, cdh_name, *argv):
-    error_starter = "Error :"
-    report_site = "..."
-    if code == 0:
-        print(error_starter, "CDH internal code error - please report at", report_site)
-    elif code == 1:
-        print(error_starter, "Index out of range in", cdh_name)
-    elif code == 2:
-        print(error_starter, "Attempting to modify read only values in name", cdh_name)
-    elif code == 3:
-        print(error_starter, "Invalid argument in", argv[0], "operator at", cdh_name, argv[0], argv[1])
-    elif code == 4:
-        print(error_starter, "Range steps exceed range length in", cdh_name)
-    elif code == 5:
-        print(error_starter, "Invalid arguments in get method at", cdh_name)
-    elif code == 6:
-        print(error_starter, "Attempting to set invalid values in", cdh_name)
-    elif code == 7:
-        print(error_starter, "Attempting to update invalid values at", cdh_name)
-    elif code == 8:
-        print(error_starter, "No common", argv[0], "found in", cdh_name, "and", argv[1])
-    elif code == 9:
-        print(error_starter, "Invalid index in common operator. Only 'key' and 'val' are accepted inputs.")
-    else:
-        error(0, cdh_name)
-    exit(0)
-
-# converts strings to numbers, returns false if not possible
-def str_to_num(str_to_conv, num_type = None):
-    if num_type == None:
-        try:
-            str_to_conv = int(str_to_conv)
-        except:
-            try:
-                str_to_conv = float(str_to_conv)
-            except:
-                try:
-                    str_to_conv = complex(str_to_conv)
-                except:
-                    return False
-    return str_to_conv
-
-# multiply 2 strings as coloumn/row vector multiplication
-def str_mul(first_str, second_str):
-    return_str = ''
-    j = 0
-    while j < min(len(first_str), len(second_str)):
-        return_str = return_str + first_str[j] + second_str[j]
-        j += 1
-    if j-1 == len(first_str):
-        return_str = return_str + second_str[j:]
-    elif j-1 == len(second_str):
-        return_str = return_str + first_str[j:]
-    return return_str
-
-# dictionary with id as numerical index as lists and standard operators
-class cdh(dict):
-    def __init__(self, data = None,  *argv, name = None, ro = False,):
-        if name == None:
-            (filename,line_number,function_name,text) = traceback.extract_stack()[-2]
-            self.name = text[:text.find("=")].strip()
-        if data is None:
-            data = {}
+class cdh():
+    def __init__(self, arg = None, *argv):
+        if arg == None:
+            self.items = []
+            len_arg = 0
+        elif type(arg) in (tuple, list):
+            len_arg = 1
+            if len(arg) == 2:          
+                self.items = [(0, str(arg[0]), arg[1])]
+            else:
+                self.items = [(0, '0', arg)]
+        elif type(arg) is dict:
+            len_arg = len(arg)
+            self.items = [(0, str(tuple(arg.keys())[0]), tuple(arg.values())[0])]
+            j = 1
+            while j < len(arg):
+                self.items.append((j, str(tuple(arg.keys())[j]), tuple(arg.values())[j]))
+                j += 1
+        elif type(arg) is cdh:
+            len_arg = len(arg)
+            self.items = [(0, arg.items[0][1], arg.items[0][2])]
+            j = 1
+            while j < len(arg):
+                self.items.append((j, arg.items[j][1], arg.items[j][2]))
+                j += 1
         else:
-            keys_to_change = []
-            if type(data) in [dict, cdh]:
-                for key,value in data.items():
-                        data.update({key : value})
-                        if type(key) is not str:
-                            keys_to_change.append(key)
-                for key_to_change in keys_to_change:
-                    data[str(key_to_change)] = data.pop(key_to_change)
-            elif type(data) in [int, float, complex, str, list]:
-                data = {'0' : data}
-        if argv != ():
-            keys_to_change = []
-            i = 1
-            for arg in argv:
-                if type(arg) in [dict, cdh]:
-                    for key,value in arg.items():
-                        data.update({key : value})
-                        if type(key) is not str:
-                            keys_to_change.append(key)
-                    for key_to_change in keys_to_change:
-                        data[str(key_to_change)] = data.pop(key_to_change)
-                elif type(arg) in [int, float, complex, str, list]:
-                    data.update({str(i) : arg})
-                i = i + 1
-        super().__init__(data)
-        self.read_only = ro
-        self.id = []
-        for i in range(len(self)):
-            self.id.append(i)
+            len_arg = 1
+            self.items = [(0, '0', arg)]
+
+        if len(argv) != 0:
+            i = 0
+            while i < len(argv):
+                if type(argv[i]) in (tuple, list):
+                    if len(argv[i]) == 2:
+                        self.items.append((len_arg+i, str(argv[i][0]), argv[i][1]))
+                    else:
+                        self.items.append((len_arg+i, str(len_arg+i), argv[i]))
+                elif type(argv[i]) is dict:
+                    j = 0
+                    while j < len(argv[i]):
+                        self.items.append((len_arg+i, str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                        j += 1
+                elif type(argv[i]) is cdh:
+                    j = 0
+                    while j < len(argv[i]):
+                        self.items.append((len_arg+i, argv[i].items[j][1], argv[i].items[j][2]))
+                        j += 1
+                else:
+                    self.items.append((len_arg+i, str(len_arg+i), argv[i]))
+                i += 1
 
     def __str__(self):
         return_str = "{"
-        i = 0
-        for key,value in self.items():
-            return_str = return_str + "(" + str(self.id[i]) + ") " + str(key) + ": " + str(value) + ", "
-            i = i + 1
+        for each in self.items:
+            return_str = return_str + "(" + str(each[0]) + ") " + str(each[1]) + ": " + str(each[2]) + ", "
         return_str = return_str.strip(", ") + "}"
         return return_str
 
+    def __len__(self):
+        return len(self.items)
+
     def __getitem__(self, index):
-        return_val = None
+        len_self = len(self)
         if type(index) is int:
-            if index >= 0 and index < len(self.id):
-                i = 0
-                for key,value in self.items():
-                    if i == index:
-                        return_val = {key: value}
-                    i += 1
-            elif index < 0 and index >= -len(self.id):
-                i = -len(self.id)
-                for key,value in self.items():
-                    if i == index:
-                        return_val = {key: value}
-                    i += 1
+            if index < len_self and index >= -len_self:
+                return {self.items[index][1]: self.items[index][2]}
             else:
-                error(1, self.name)
+                print('Index out of range.')
+                exit(0)
         elif type(index) is slice:
-            return_val = dict()
-            index_start = index.start
-            index_stop = index.stop
-            if index_start == None:
-                index_start = 0
-            if index_stop == None:
-                index_stop = len(self)
-            if index_start < 0:
-                index_start = index_start + len(self) + 1
-            if index_stop < 0:
-                index_stop = index_stop + len(self) + 1
-            if index_start <= len(self) and index_stop <= len(self):
-                if index_stop > index_start:
-                    slice_range = range(index_start, index_stop - 1)
-                    i = index_start
-                    max_slice_range = index_stop - 1
-                elif index_start == index_stop:
-                    slice_range = range(index_start, index_start)
-                    i = index_start
-                    max_slice_range = index_start
-                elif index_start > index_stop:
-                    slice_range = range(index_stop, index_start - 1)
-                    i = index_stop
-                    max_slice_range = index_start - 1
+            start = index.start
+            end = index.stop
+            steps = index.step
+            if start == None:
+                start = 0
+            if end == None:
+                end = len_self-1
+            if steps == None:
+                steps = 1
+            if start >= 0 and end >= start and end < len(self.items) and steps > 0 and steps < len_self:
+                return_dict = dict()
+                while start <= end:
+                    return_dict.update({self.items[start][1]: self.items[start][2]})
+                    start += steps
+                return return_dict
             else:
-                error(1, self.name)
+                print('Index out of range.')
+                exit(0)
+        elif type(index) is str:
+            i = 0
+            return_value = []
+            while i < len_self:
+                if index == self.items[i][1]:
+                    return_value.append(self.items[i][2])
+                i += 1
+            if len(return_value) == 1:
+                return return_value[0]
+            else:
+                return return_value
+        else:
+            print('Invalid index.')
+            exit(0)
+    
+    def __setitem__(self, index, value):
+        len_self = len(self)
+        if type(index) is int:
+            if index < len_self and index >= -len_self:
+                if index < 0:
+                    index += len_self
+                if type(value) is dict and len(value) == 1:
+                    self.items[index] = (index, tuple(value.keys())[0], tuple(value.values())[0])
+                else:
+                    self.items[index] = (index, str(index), value)
+            else:
+                print('Index out of range.')
+                exit(0)
+        elif type(index) is slice:
+            start = index.start
+            end = index.stop
+            steps = index.step
+            if start == None:
+                start = 0
+            if end == None:
+                end = len_self-1
+            if steps == None:
+                steps = 1
+            if type(value) in (tuple, list, dict, cdh) and start >= 0 and end >= start and end < len_self and steps > 0 and steps < len_self and len(value) == end-start+1:
+                i = 0
+                while start <= end:
+                    if type(value) is dict:
+                        self.items[start] = (start, tuple(value.keys())[i], tuple(value.values())[i])
+                    elif type(value) is cdh:
+                        self.items[start] = (start, value.items[i][1], value.items[i][2])
+                    else:
+                        self.items[start] = (start, tuple(self.keys())[start], value[i])
+                    start += steps
+                    i += 1
+            else:
+                print('Index out of range.')
+                exit(0)
+        elif type(index) is str:
+            i = 0
+            while i < len_self:
+                if index == self.items[i][1]:
+                    self.items[i] = (i, index, value)
+                i += 1
+        else:
+            print('Invalid index.')
+            exit(0)
+
+    def __add__(self, other):
+        return_cdh = cdh()
+        if len(self) == len(other):
+            for i in range(len(self)):
+                try:
+                    return_cdh.update((i, self.items[i][1], self.items[i][2] + other.items[i][2]))
+                except:
+                    print('Error at cdh sum at id', i)
+                    exit(0)
+        else:
+            print('Error at sum, cdhs of different length.')
+            exit(0)
+        return return_cdh
+
+    def __sub__(self, other):
+        return_cdh = cdh()
+        if len(self) == len(other):
+            for i in range(len(self)):
+                try:
+                    return_cdh.update((i, self.items[i][1], self.items[i][2] - other.items[i][2]))
+                except:
+                    print('Error at cdh subtract at id', i)
+                    exit(0)
+        else:
+            print('Error at subtraction, cdhs of different length.')
+            exit(0)
+        return return_cdh
+
+    def __mul__(self, other):
+        return_cdh = cdh()
+        if len(self) == len(other):
+            for i in range(len(self)):
+                try:
+                    return_cdh.update((i, self.items[i][1], self.items[i][2] * other.items[i][2]))
+                except:
+                    print('Error at cdh multiplicate at id', i)
+                    exit(0)
+        else:
+            print('Error at multiplication, cdhs of different length.')
+            exit(0)
+        return return_cdh
+
+    def __truediv__(self, other):
+        return_cdh = cdh()
+        if len(self) == len(other):
+            for i in range(len(self)):
+                try:
+                    return_cdh.update((i, self.items[i][1], self.items[i][2] / other.items[i][2]))
+                except:
+                    print('Error at cdh division at id', i)
+                    exit(0)
+        else:
+            print('Error at division, cdhs of different length.')
+            exit(0)
+        return return_cdh
+
+    # updates a cdh by adding as elements arg and argv. if arg or argv are dicts or chs replace same key's values.
+    def update(self, arg, *argv):
+        if arg == None:
+            temp = cdh(self)
+            self = cdh(temp)
+        elif type(arg) in (tuple, list):
+            len_arg = 1
+            self.items.append((len(self), str(len(self)), arg))
+        elif type(arg) is dict:
+            len_arg = len(arg)
             j = 0
-            if index.step != None:
-                if index.step <= index.stop - index.start:
-                    step_counter = index.step + i
-                    for key,value in self.items():
-                        if i <= max_slice_range and i == self.id[j]:
-                            if i == step_counter:
-                                return_val.update({key: value})
-                                step_counter = step_counter + index.step
-                            elif i == slice_range[0]:
-                                return_val.update({key: value})
-                            i += 1
+            while j < len_arg:
+                i = 0
+                is_replaced = False
+                while i < len(self):
+                    if str(tuple(arg.keys())[j]) == self.items[i][1]:
+                        self.items[i] = (i, str(tuple(arg.keys())[j]), tuple(arg.values())[j])
+                        is_replaced = True
+                    i += 1
+                if is_replaced == False:
+                    self.items.append((len(self), str(tuple(arg.keys())[j]), tuple(arg.values())[j]))
+                j += 1
+        elif type(arg) is cdh:
+            len_arg = len(arg)
+            j = 0
+            while j < len_arg:
+                i = 0
+                is_replaced = False
+                while i < len(self):
+                    if arg.items[j][1] == self.items[i][1]:
+                        self.items[i] = (i, arg.items[j][1], arg.items[j][2])
+                        is_replaced = True
+                    i += 1
+                if is_replaced == False:
+                    self.items.append((len(self), arg.items[j][1], arg.items[j][2]))
+                j += 1
+        else:
+            len_arg = 1
+            self.items.append((len(self), str(len(self)), arg))
+        if len(argv) != 0:
+            i = 0
+            while i < len(argv):
+                if type(argv[i]) in (tuple, list):
+                    self.items.append((len(self), str(len(self)), argv[i]))
+                elif type(argv[i]) is dict:
+                    j = 0
+                    while j < len(argv[i]):
+                        k = 0
+                        is_replaced = False
+                        while k < len(self):
+                            if str(tuple(argv[i].keys())[j]) == self.items[k][1]:
+                                self.items[k] = (k, str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j])
+                                is_replaced = True
+                            k += 1
+                        if is_replaced == False:
+                            self.items.append((len(self), str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                        j += 1
+                elif type(argv[i]) is cdh:
+                    j = 0
+                    while j < len(argv[i]):
+                        k = 0
+                        is_replaced = False
+                        while k < len(self):
+                            if argv[i].items[j][1] == self.items[k][1]:
+                                self.items[k] = (k, argv[i].items[j][1], argv[i].items[j][2])
+                                is_replaced = True
+                            k += 1
+                        if is_replaced == False:
+                            self.items.append((len(self), argv[i].items[j][1], argv[i].items[j][2]))
                         j += 1
                 else:
-                    error(4, self.name)
-            else:
-                for key,value in self.items():
-                    if i <= max_slice_range and i == self.id[j]:
-                        return_val.update({key: value})
-                        i += 1
+                    self.items.append((len(self), str(len(self)), argv[i]))
+                i += 1
+
+    # appends arg and argv as elements to a cdh. (can duplicate keys)
+    def append(self, arg, *argv):
+        if arg == None:
+            pass
+        elif type(arg) in (tuple, list):
+            len_arg = 1
+            self.items.append((len(self), str(len(self)), arg))
+        elif type(arg) is dict:
+            len_arg = len(arg)
+            j = 0
+            while j < len_arg:
+                self.items.append((len(self), str(tuple(arg.keys())[j]), tuple(arg.values())[j]))
+                j += 1
+        elif type(arg) is cdh:
+            len_arg = len(arg)
+            j = 0
+            while j < len_arg:
+                self.items.append((len(self), arg.items[j][1], arg.items[j][2]))
+                j += 1
+        else:
+            len_arg = 1
+            self.items.append((len(self), str(len(self)), arg))
+        if len(argv) != 0:
+            i = 0
+            while i < len(argv):
+                if type(argv[i]) in (tuple, list):
+                    self.items.append((len(self), str(len(self)), argv[i]))
+                elif type(argv[i]) is dict:
+                    j = 0
+                    while j < len(argv[i]):
+                        self.items.append((len(self), str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                        j += 1
+                elif type(argv[i]) is cdh:
+                    j = 0
+                    while j < len(argv[i]):
+                        self.items.append((len(self), argv[i].items[j][1], argv[i].items[j][2]))
+                        j += 1
+                else:
+                    self.items.append((len(self), str(len(self)), argv[i]))
+                i += 1
+
+    # removes all elements from a cdh with index id, key or value.
+    def pop(self, value, arg = None):
+        init_len_self = len(self)
+        if arg == 'id' or (type(value) == int and arg == None):
+            try:
+                value = int(value)
+            except:
+                print('Invalid id in pop method.')
+                exit(0)
+            k = 0
+        elif arg == 'key' or (type(value) == str and arg == None):
+            try:
+                value = str(value)
+            except:
+                print('Invalid key in pop method.')
+                exit(0)
+            k = 1
+        elif arg == 'val':
+            k = 2
+        else:
+            print('Invalid argument, can intersect on \'key\' or \'val\' only.')
+            exit(0)
+        i = 0
+        while i < len(self):
+            if value == self.items[i][k]:
+                self.items.pop(i)
+                if i != len(self):
+                    j = i
+                    while j < len(self):
+                        self.items[j] = (j, self.items[j][1], self.items[j][2])
+                        j += 1
+            i += 1
+        if len(self) == init_len_self:
+            print('Invalid value or key in pop method.')
+            exit(0)
+
+    # returns a cdh built with self and other elemenmt's. overlapping keys are not merged. (can duplicate keys)
+    def join(self, other):
+        return_ch = cdh(self)
+        if type(other) is cdh:
+            i = 0
+            j = len(return_ch)
+            while i < len(other):
+                return_ch.items.append((j, other.items[i][1], other.items[i][2]))
+                i += 1
+                j += 1
+        else:
+            print('Invalid Type, can join only chs.')
+            exit(0)
+        return return_ch
+
+    # returns a cdh built with self and other. overlapping keys are merged with other's value.
+    def merge(self, other):
+        return_ch = cdh(self)
+        if type(other) is cdh:
+            i = 0
+            j = len(self)
+            while i < len(other):
+                k = 0
+                while k < len(self):
+                    if other.items[i][1] == return_ch.items[k][1]:
+                        return_ch.items[k] = (k, other.items[i][1], other.items[i][2])
+                        k = -1
+                        break
+                    k += 1
+                if k != -1:
+                    return_ch.items.append((j, other.items[i][1], other.items[i][2]))
                     j += 1
-            if return_val == {}:
-                return_val = None
-        else:
-            if type(index) is not str:
-                index = str(index)
-
-            return_val = None
-            for key,value in self.items():
-                if key == index:
-                    return_val = value
-                    break
-        return return_val
-
-    def __setitem__(self, index, set_value):
-        if type(index) is int:
-            def int_setter(set_key, set_value):
-                if type(set_value) is dict:
-                    set_value = cdh(set_value)
-                if type(set_value) is cdh:
-                    if len(set_value) == 1:
-                        temp_cdh = cdh()
-                        j = len(self.id) - 1
-                        if index < 0:
-                            set_index = index+len(self.id)
-                        else:
-                            set_index = index
-                        while j >= set_index:
-                            if j != set_index:
-                                temp_cdh.update(self[j])
-                            self.pop(j)
-                            j -= 1
-                        self.update({set_value.get('key', 0): set_value.get('val', 0)})
-                        self.update(temp_cdh)
-                    else:
-                        self.update({set_key : set_value})
-                else:
-                    self.update({set_key : set_value})
-
-            if index >= 0 and index < len(self.id):
-                i = 0
-                for key in self.keys():
-                    if i == index:
-                        int_setter(key, set_value)
-                        break
-                    i += 1
-            elif index < 0 and index >= -len(self.id):
-                i = -len(self.id)
-                for key in self.keys():
-                    if i == index:
-                        int_setter(key, set_value)
-                        break
-                    i += 1
-            else:
-                error(1, self.name)
-        else:
-            if type(index) is not str:
-                index = str(index)
-
-            for key in self.keys():
-                if key == index:
-                    if set_value in [dict, cdh]:
-                        print('debug')
-                        self.update(set_value)
-                    else:
-                        self.update({key : set_value})
-                    break
-
-    def __add__(self, other): # Automatic number to string cast on direct sum
-        if type(other) in [int, float, complex, str, list, dict, cdh]:
-            i = 0
-            return_val = cdh()
-            other_name = ''
-            if type(other) in [int, float, complex, str]:
-                other_name = [k for k,v in locals().items() if v == other][0]
-                other = [other]
-            elif type(other) is list:
-                other_name = [k for k,v in locals().items() if v == other][0]
-            elif type(other) is dict:
-                other = cdh(other)
-                other_name = other.name
-            elif type(other) is cdh:
-                other_name = other.name             
-            while i < max(len(self), len(other)):
-                if i < min(len(self), len(other)):
-                    if type(other) is list:
-                        other_i = other[i]
-                    elif type(other) is cdh:
-                        other_i = other.get("val", i)
-                    if type(other_i) in [int, float, complex]:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            return_val.update({self.get("key", i) : self.get("val", i) + other_i})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) + other})
-                            else:
-                                return_val.update({self.get("key", i) : self.get("val", i) + str(other_i)})
-                        else:
-                            error(3, self.name, "+", other_name)
-                    elif type(other_i) is str:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            if str_to_num(other_i):
-                                return_val.update({self.get("key", i) : self.get("val", i) + str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : str(self.get("val", i)) + other_i})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)) and str_to_num(other_i):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) + str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : self.get("val", i) + other_i})
-                        else:
-                            error(3, self.name, "+", other_name)
-                else:
-                    if len(self) > len(other):
-                        return_val.update({self.get("key", i) : self.get("val", i)})
-                    elif len(other) > len(self):
-                        if type(other) is list:
-                            other_i = other[i]
-                        elif type(other) is cdh:
-                            other_i = other.get("val", i)
-                        return_val.update({i : other_i})
                 i += 1
-            return return_val
         else:
-            error(3, self.name, "+", other_name)
+            print('Invalid Type, can merge only chs.')
+            exit(0)
+        return return_ch
 
-    def __sub__(self, other): # Automatic number to string cast on direct subtraction
-        if type(other) in [int, float, complex, str, list, dict, cdh]:
-            i = 0
-            return_val = cdh()
-            other_name = ''
-            if type(other) in [int, float, complex, str]:
-                other_name = [k for k,v in locals().items() if v == other][0]
-                other = [other]
-            elif type(other) is list:
-                other_name = [k for k,v in locals().items() if v == other][0]
-            elif type(other) is dict:
-                other = cdh(other)
-                other_name = other.name
-            elif type(other) is cdh:
-                other_name = other.name             
-            while i < max(len(self), len(other)):
-                if i < min(len(self), len(other)):
-                    if type(other) is list:
-                        other_i = other[i]
-                    elif type(other) is cdh:
-                        other_i = other.get("val", i)
-                    if type(other_i) in [int, float, complex]:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            return_val.update({self.get("key", i) : self.get("val", i) - other_i})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) - other})
-                            else:
-                                return_val.update({self.get("key", i) : self.get("val", i).strip(str(other_i))})
-                        else:
-                            error(3, self.name, "-", other_name)
-                    elif type(other_i) is str:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            if str_to_num(other_i):
-                                return_val.update({self.get("key", i) : self.get("val", i) - str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : str(self.get("val", i)).strip(other_i)})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)) and str_to_num(other_i):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) - str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : self.get("val", i).strip(other_i)})
-                        else:
-                            error(3, self.name, "-", other_name)
-                else:
-                    if len(self) > len(other):
-                        return_val.update({self.get("key", i) : self.get("val", i)})
-                    elif len(other) > len(self):
-                        if type(other) is list:
-                            other_i = other[i]
-                        elif type(other) is cdh:
-                            other_i = other.get("val", i)
-                        return_val.update({i : other_i})
-                i += 1
-            return return_val
+    # returns a cdh built with elements of common keys or values (can duplicate keys)
+    def common(self, other, arg = None):
+        return_ch = cdh()
+        if arg == 'key' or arg == None:
+            k = 1
+        elif arg == 'val':
+            k = 2
         else:
-            error(3, self.name, "-", other_name)
-
-    def __mul__(self, other): # Automatic number to string cast on direct multiplication
-        if type(other) in [int, float, complex, str, list, dict, cdh]:
-            i = 0
-            return_val = cdh()
-            other_name = ''
-            if type(other) in [int, float, complex, str]:
-                other_name = [k for k,v in locals().items() if v == other][0]
-                other = [other]
-            elif type(other) is list:
-                other_name = [k for k,v in locals().items() if v == other][0]
-            elif type(other) is dict:
-                other = cdh(other)
-                other_name = other.name
-            elif type(other) is cdh:
-                other_name = other.name             
-            while i < max(len(self), len(other)):
-                if i < min(len(self), len(other)):
-                    if type(other) is list:
-                        other_i = other[i]
-                    elif type(other) is cdh:
-                        other_i = other.get("val", i)
-                    if type(other_i) in [int, float, complex]:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            return_val.update({self.get("key", i) : self.get("val", i) * other_i})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) * other})
-                            else:
-                                return_val.update({self.get("key", i) : str_mul(self.get("val", i), str(other_i))})
-                        else:
-                            error(3, self.name, "*", other_name)
-                    elif type(other_i) is str:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            if str_to_num(other_i):
-                                return_val.update({self.get("key", i) : self.get("val", i) * str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : str_mul(str(self.get("val", i)), other_i)})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)) and str_to_num(other_i):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) * str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : str_mul(self.get("val", i), other_i)})
-                        else:
-                            error(3, self.name, "*", other_name)
-                else:
-                    if len(self) > len(other):
-                        return_val.update({self.get("key", i) : self.get("val", i)})
-                    elif len(other) > len(self):
-                        if type(other) is list:
-                            other_i = other[i]
-                        elif type(other) is cdh:
-                            other_i = other.get("val", i)
-                        return_val.update({i : other_i})
-                i += 1
-            return return_val
-        else:
-            error(3, self.name, "*", other_name)
-
-    def __truediv__(self, other): # Automatic number to string cast on direct division
-        if type(other) in [int, float, complex, str, list, dict, cdh]:
-            i = 0
-            return_val = cdh()
-            other_name = ''
-            if type(other) in [int, float, complex, str]:
-                other_name = [k for k,v in locals().items() if v == other][0]
-                other = [other]
-            elif type(other) is list:
-                other_name = [k for k,v in locals().items() if v == other][0]
-            elif type(other) is dict:
-                other = cdh(other)
-                other_name = other.name
-            elif type(other) is cdh:
-                other_name = other.name             
-            while i < max(len(self), len(other)):
-                if i < min(len(self), len(other)):
-                    if type(other) is list:
-                        other_i = other[i]
-                    elif type(other) is cdh:
-                        other_i = other.get("val", i)
-                    if type(other_i) in [int, float, complex]:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            return_val.update({self.get("key", i) : self.get("val", i) / other_i})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) / other_i})
-                            else:
-                                return_val.update({self.get("key", i) : self.get("val", i).split(str(other_i))[0] + self.get("val", i).split(str(other_i))[1]})
-                        else:
-                            error(3, self.name, "/", other_name)
-                    elif type(other_i) is str:
-                        if type(self.get("val", i)) in [int, float, complex]:
-                            if str_to_num(other_i):
-                                return_val.update({self.get("key", i) : self.get("val", i) / str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : str(self.get("val", i)).split(other_i)[0] + str(self.get("val", i)).split(other_i)[1]})
-                        elif type(self.get("val", i)) is str:
-                            if str_to_num(self.get("val", i)) and str_to_num(other_i):
-                                return_val.update({self.get("key", i) : str_to_num(self.get("val", i)) / str_to_num(other_i)})
-                            else:
-                                return_val.update({self.get("key", i) : self.get("val", i).split(other_i)[0] + self.get("val", i).split(other_i)[1]})
-                        else:
-                            error(3, self.name, "/", other_name)
-                else:
-                    if len(self) > len(other):
-                        return_val.update({self.get("key", i) : self.get("val", i)})
-                    elif len(other) > len(self):
-                        if type(other) is list:
-                            other_i = other[i]
-                        elif type(other) is cdh:
-                            other_i = other.get("val", i)
-                        return_val.update({i : other_i})
-                i += 1
-            return return_val
-        else:
-            error(3, self.name, "/", other_name)
-
-    def get(self, index = None, id = None):
-        if index == None:
-            if id != None:
-                if type(id) is int and id <= len(self.id) and id >= -len(self.id):
-                    return {list(self[id].keys())[0] : list(self[id].values())[0]}
-                else:
-                    error(5, self.name)
-            else:
-                return self
-        else:
-            if id != None:
-                if index == "val":
-                    if type(id) is int and id < len(self.id) and id >= -len(self.id):
-                        return list(self[id].values())[0]
-                    else:
-                        error(5, self.name)
-                elif index == "key":
-                    if type(id) is int and id < len(self.id) and id >= -len(self.id):
-                        return list(self[id].keys())[0]
-                    else:
-                        error(5, self.name)
-                else:
-                    error(5, self.name)
-            else:
-                if index == "val":
-                    return_val = []
-                    for value in self.values():
-                        return_val.append(value)
-                    return return_val
-                elif index == "key":
-                    return_val = []
-                    for key in self.keys():
-                        return_val.append(key)
-                    return return_val
-                else:
-                    error(5, self.name)
-    
-    def set(self, other):
-        if type(other) is list:
-            self.clear()
-            self.id.clear()
-            i = 0
-            while i < len(other):
-                self.update({str(len(self.id)) : other[i]})
-                i = i + 1
-        elif type(other) is dict:
-            self.clear()
-            self.id.clear()
-            for key,value in other.items():
-                self.update({key : value})
-        elif type(other) is cdh:
-            if self.read_only == False and other.read_only == False:
-                self.clear()
-                self.id.clear()
-                for key,value in other.items():
-                    self.update({key : value})
-            else:
-                if self.read_only == True:
-                    error(2, self.name)
-                elif other.read_only == True:
-                    error(2, other.name)
-                else:
-                    error(2, self.name)
-                    error(2, other.name)
-        elif type(other) in [int, float, complex, str]:
-            self.clear()
-            self.id.clear()
-            self.update({'0' : other})
-        else:
-            error(6, self.name)
-
-    def update(self, value):
-        if self.read_only == False:
-            if type(value) in [int, float, complex, str]:
-                super(cdh, self).update({str(len(self.id)) : value})
-                self.id.append(len(self.id))
-            elif type(value) is list:
-                i = 0
-                while i < len(value):
-                    super(cdh, self).update({str(len(self.id)) : value[i]})
-                    self.id.append(len(self.id))
-                    i += 1
-            elif type(value) in [dict, cdh]:
-                for key in value.keys():
-                    if key not in self.keys():
-                        self.id.append(len(self.id))
-                super(cdh, self).update(value)
-            else:
-                error(7, self.name)
-        else:
-            error(2, self.name)
-
-    def pop(self, index):
-        if type(index) is int:
-            if index >= 0 and index < len(self.id):
-                for each in self.id:
-                    if index == each:
-                        super(cdh, self).pop(self.get('key', each))
-                        index = None
-                        break
-            elif index < 0 and index >= -len(self.id):
-                for each in range(1, len(self.id)+1):
-                    if index == -each:
-                        super(cdh, self).pop(self.get('key', index))
-                        index = None
-                if index != None:
-                    error(1, self.name)
-            else:
-                error(1, self.name)
-        else:
-            super(cdh, self).pop(index)
-
-    def common(self, other, index = 'key'):
-        if type(other) in [int, float, complex, str]:
-            if index == 'key':
-                if str(other) in self.keys():
-                    self.clear()
-                    self.id.clear()
-                    self.update({str(other) : None})
-                else:
-                    error(8, self.name, index, other)
-            elif index == 'val':
-                if other in self.values():
-                    self.clear()
-                    self.id.clear()
-                    self.update({'0' : other})
-                else:
-                    error(8, self.name, index, other)
-            else:
-                error(9, self.name)
-        elif type(other) is list:
-            temp = list()
-            i = 0
-            while i < len(other):
-                if index == 'key':
-                    if str(other[i]) in self.keys():
-                        temp.update({str(other[i]) : None})
-                elif index == 'val':
-                    if other[i] in self.values():
-                        temp.update({str(i) : other[i]})
-                i += 1
-            self.clear()
-            self.id.clear()
-            self.set(temp)
-            del temp
-            if len(self) == 0:
-                error(8, self.name, index, other)
-        elif type(other) in [dict, cdh]:
-            if type(other) is dict:
-                other = cdh(other)
-            if self.read_only == False and other.read_only == False:
-                temp = cdh()
-                if index == 'key':
-                    i = 0
-                    for key,value in other.items():
-                        if key in self.keys():
-                            temp.update({key : value})
-                        i += 1
-                elif index == 'val':
-                    i = 0
-                    for key,value in other.items():
-                        if value in self.values():
-                            temp.update({key : value})
-                        i += 1
-                else:
-                    error(9, self.name)
-                self.clear()
-                self.id.clear()
-                self.set(temp)
-                del temp
-                if len(self) == 0:
-                    error(8, self.name, index, other.name)
-            else:
-                if self.read_only == True:
-                    error(2, self.name)
-                elif other.read_only == True:
-                    error(2, other.name)
-                else:
-                    error(2, self.name)
-                    error(2, other.name)
-
-        else:
-            error(6, self.name)
-
-    def ro(self):
-        self.read_only = True
+            print('Invalid argument, can intersect on \'key\' or \'val\' only.')
+        i = 0
+        l = 0
+        while i < len(self):
+            j = 0
+            while j < len(other):
+                if self.items[i][k] == other.items[j][k]:
+                    return_ch.items.append((l, self.items[i][1], self.items[i][2]))
+                    l += 1
+                j += 1
+            i += 1
+        return return_ch
