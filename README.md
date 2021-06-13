@@ -108,4 +108,4 @@ Returns a cdh buildt using common keys using ‘key’ as second argument, or co
   - Added update, append, pop methods on modifying existing cdh.
 
 
-Please report any Bug or Coding Error at robiamado@gmail.com.
+Please report any Bugs at robiamado@gmail.com.
