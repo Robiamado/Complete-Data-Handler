@@ -5,48 +5,47 @@ class cdh():
             len_arg = 0
         elif type(arg) in (tuple, list):
             len_arg = 1
-            if len(arg) == 2:          
-                self.items = [(0, str(arg[0]), arg[1])]
-            else:
-                self.items = [(0, '0', arg)]
+            self.items = [(0, '0', arg)]
         elif type(arg) is dict:
             len_arg = len(arg)
             self.items = [(0, str(tuple(arg.keys())[0]), tuple(arg.values())[0])]
             j = 1
-            while j < len(arg):
+            while j < len_arg:
                 self.items.append((j, str(tuple(arg.keys())[j]), tuple(arg.values())[j]))
                 j += 1
         elif type(arg) is cdh:
             len_arg = len(arg)
             self.items = [(0, arg.items[0][1], arg.items[0][2])]
             j = 1
-            while j < len(arg):
+            while j < len_arg:
                 self.items.append((j, arg.items[j][1], arg.items[j][2]))
                 j += 1
         else:
             len_arg = 1
             self.items = [(0, '0', arg)]
 
-        if len(argv) != 0:
+        len_argv = len(argv)
+        if len_argv != 0:
             i = 0
-            while i < len(argv):
+            while i < len_argv:
                 if type(argv[i]) in (tuple, list):
-                    if len(argv[i]) == 2:
-                        self.items.append((len_arg+i, str(argv[i][0]), argv[i][1]))
-                    else:
-                        self.items.append((len_arg+i, str(len_arg+i), argv[i]))
+                    self.items.append((len_arg, str(len_arg), argv[i]))
+                    len_arg += 1
                 elif type(argv[i]) is dict:
                     j = 0
                     while j < len(argv[i]):
-                        self.items.append((len_arg+i, str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                        self.items.append((len_arg, str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                        len_arg += 1
                         j += 1
                 elif type(argv[i]) is cdh:
                     j = 0
                     while j < len(argv[i]):
-                        self.items.append((len_arg+i, argv[i].items[j][1], argv[i].items[j][2]))
+                        self.items.append((len_arg, argv[i].items[j][1], argv[i].items[j][2]))
+                        len_arg += 1
                         j += 1
                 else:
-                    self.items.append((len_arg+i, str(len_arg+i), argv[i]))
+                    self.items.append((len_arg, str(len_arg), argv[i]))
+                    len_arg += 1
                 i += 1
 
     def __str__(self):
