@@ -8,13 +8,15 @@ class cdh():
             self.items = [(0, '0', arg)]
         elif type(arg) is dict:
             len_arg = len(arg)
-            self.items = [(0, str(tuple(arg.keys())[0]), tuple(arg.values())[0])]
+            self.items = [(0, str(tuple(arg.keys())[0]), 
+                           tuple(arg.values())[0])]
             j = 1
             while j < len_arg:
-                self.items.append((j, str(tuple(arg.keys())[j]), tuple(arg.values())[j]))
+                self.items.append((j, str(tuple(arg.keys())[j]), 
+                                   tuple(arg.values())[j]))
                 j += 1
         elif type(arg) is cdh:
-            len_arg = len(arg)
+            len_arg = len(arg.items)
             self.items = [(0, arg.items[0][1], arg.items[0][2])]
             j = 1
             while j < len_arg:
@@ -23,7 +25,6 @@ class cdh():
         else:
             len_arg = 1
             self.items = [(0, '0', arg)]
-
         len_argv = len(argv)
         if len_argv != 0:
             i = 0
@@ -34,13 +35,16 @@ class cdh():
                 elif type(argv[i]) is dict:
                     j = 0
                     while j < len(argv[i]):
-                        self.items.append((len_arg, str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                        self.items.append((len_arg, 
+                                           str(tuple(argv[i].keys())[j]), 
+                                           tuple(argv[i].values())[j]))
                         len_arg += 1
                         j += 1
                 elif type(argv[i]) is cdh:
                     j = 0
-                    while j < len(argv[i]):
-                        self.items.append((len_arg, argv[i].items[j][1], argv[i].items[j][2]))
+                    while j < len(argv[i].items):
+                        self.items.append((len_arg, argv[i].items[j][1], 
+                                           argv[i].items[j][2]))
                         len_arg += 1
                         j += 1
                 else:
@@ -49,17 +53,18 @@ class cdh():
                 i += 1
 
     def __str__(self):
-        return_str = "{"
+        return_str = '{'
         for each in self.items:
-            return_str = return_str + "(" + str(each[0]) + ") " + str(each[1]) + ": " + str(each[2]) + ", "
-        return_str = return_str.strip(", ") + "}"
+            return_str += '(' + str(each[0]) + ') '
+            return_str +=  str(each[1]) + ': ' + str(each[2]) + ', '
+        return_str = return_str.strip(', ') + '}'
         return return_str
 
     def __len__(self):
         return len(self.items)
 
     def __getitem__(self, index):
-        len_self = len(self)
+        len_self = len(self.items)
         if type(index) is int:
             if index < len_self and index >= -len_self:
                 return {self.items[index][1]: self.items[index][2]}
@@ -76,10 +81,12 @@ class cdh():
                 end = len_self-1
             if steps == None:
                 steps = 1
-            if start >= 0 and end >= start and end < len(self.items) and steps > 0 and steps < len_self:
+            if start >= 0 and end >= start and end < len(self.items) and (
+                steps > 0 and steps < len_self):
                 return_dict = dict()
                 while start <= end:
-                    return_dict.update({self.items[start][1]: self.items[start][2]})
+                    return_dict.update(
+                        {self.items[start][1]: self.items[start][2]})
                     start += steps
                 return return_dict
             else:
@@ -101,13 +108,14 @@ class cdh():
             exit(0)
     
     def __setitem__(self, index, value):
-        len_self = len(self)
+        len_self = len(self.items)
         if type(index) is int:
             if index < len_self and index >= -len_self:
                 if index < 0:
                     index += len_self
                 if type(value) is dict and len(value) == 1:
-                    self.items[index] = (index, tuple(value.keys())[0], tuple(value.values())[0])
+                    self.items[index] = (index, str(tuple(value.keys())[0]), 
+                                         tuple(value.values())[0])
                 else:
                     self.items[index] = (index, str(index), value)
             else:
@@ -123,15 +131,24 @@ class cdh():
                 end = len_self-1
             if steps == None:
                 steps = 1
-            if type(value) in (tuple, list, dict, cdh) and start >= 0 and end >= start and end < len_self and steps > 0 and steps < len_self and len(value) == end-start+1:
+            if type(value) in (tuple, list, dict, cdh) and (
+                start >= 0 and end >= start and end < len_self) and (
+                steps > 0 and steps < len_self) and (
+                len(value) == end-start+1):
                 i = 0
                 while start <= end:
                     if type(value) is dict:
-                        self.items[start] = (start, tuple(value.keys())[i], tuple(value.values())[i])
+                        self.items[start] = (start, 
+                                             str(tuple(value.keys())[i]), 
+                                             tuple(value.values())[i])
                     elif type(value) is cdh:
-                        self.items[start] = (start, value.items[i][1], value.items[i][2])
+                        self.items[start] = (start, 
+                                             value.items[i][1], 
+                                             value.items[i][2])
                     else:
-                        self.items[start] = (start, tuple(self.keys())[start], value[i])
+                        self.items[start] = (start, 
+                                             tuple(self.keys())[start], 
+                                             value[i])
                     start += steps
                     i += 1
             else:
@@ -149,132 +166,146 @@ class cdh():
 
     def __add__(self, other):
         return_cdh = cdh()
-        if len(self) == len(other):
-            for i in range(len(self)):
+        if len(self.items) == len(other):
+            for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], self.items[i][2] + other.items[i][2]))
+                    return_cdh.update((i, self.items[i][1], 
+                                       self.items[i][2] + other.items[i][2]))
                 except:
-                    print('Error at cdh sum at id', i)
+                    print('Error in cdh sum at id', i)
                     exit(0)
         else:
-            print('Error at sum, cdhs of different length.')
+            print('Error in sum, cdhs of different length.')
             exit(0)
         return return_cdh
 
     def __sub__(self, other):
         return_cdh = cdh()
-        if len(self) == len(other):
-            for i in range(len(self)):
+        if len(self.items) == len(other):
+            for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], self.items[i][2] - other.items[i][2]))
+                    return_cdh.update((i, self.items[i][1], 
+                                       self.items[i][2] - other.items[i][2]))
                 except:
-                    print('Error at cdh subtract at id', i)
+                    print('Error in cdh subtract at id', i)
                     exit(0)
         else:
-            print('Error at subtraction, cdhs of different length.')
+            print('Error in subtract, cdhs of different length.')
             exit(0)
         return return_cdh
 
     def __mul__(self, other):
         return_cdh = cdh()
-        if len(self) == len(other):
-            for i in range(len(self)):
+        if len(self.items) == len(other):
+            for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], self.items[i][2] * other.items[i][2]))
+                    return_cdh.update((i, self.items[i][1], 
+                                       self.items[i][2] * other.items[i][2]))
                 except:
-                    print('Error at cdh multiplicate at id', i)
+                    print('Error in cdh multiplicate at id', i)
                     exit(0)
         else:
-            print('Error at multiplication, cdhs of different length.')
+            print('Error in multiplicate, cdhs of different length.')
             exit(0)
         return return_cdh
 
     def __truediv__(self, other):
         return_cdh = cdh()
-        if len(self) == len(other):
-            for i in range(len(self)):
+        if len(self.items) == len(other):
+            for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], self.items[i][2] / other.items[i][2]))
+                    return_cdh.update((i, self.items[i][1], 
+                                       self.items[i][2] / other.items[i][2]))
                 except:
-                    print('Error at cdh division at id', i)
+                    print('Error in cdh divide at id', i)
                     exit(0)
         else:
-            print('Error at division, cdhs of different length.')
+            print('Error in division, cdhs of different length.')
             exit(0)
         return return_cdh
 
-    # updates a cdh by adding as elements arg and argv. if arg or argv are dicts or chs replace same key's values.
-    def update(self, arg, *argv):
+    # updates a cdh by adding as elements arg and argv. if arg or argv are 
+    # dicts or chs replace same key's values.
+    def update(self, arg = None, *argv):
         if arg == None:
-            temp = cdh(self)
-            self = cdh(temp)
-        elif type(arg) in (tuple, list):
+            pass
+        if type(arg) in (tuple, list):
             len_arg = 1
-            self.items.append((len(self), str(len(self)), arg))
+            self.items.append((len(self.items), str(len(self.items)), arg))
         elif type(arg) is dict:
             len_arg = len(arg)
             j = 0
             while j < len_arg:
                 i = 0
                 is_replaced = False
-                while i < len(self):
-                    if str(tuple(arg.keys())[j]) == self.items[i][1]:
-                        self.items[i] = (i, str(tuple(arg.keys())[j]), tuple(arg.values())[j])
+                arg_j_key = str(tuple(arg.keys())[j])
+                while i < len(self.items):
+                    if arg_j_key == self.items[i][1]:
+                        self.items[i] = (i, arg_j_key, 
+                                         tuple(arg.values())[j])
                         is_replaced = True
                     i += 1
                 if is_replaced == False:
-                    self.items.append((len(self), str(tuple(arg.keys())[j]), tuple(arg.values())[j]))
+                    self.items.append((len(self.items), arg_j_key, 
+                                       tuple(arg.values())[j]))
                 j += 1
         elif type(arg) is cdh:
-            len_arg = len(arg)
+            len_arg = len(arg.items)
             j = 0
             while j < len_arg:
                 i = 0
                 is_replaced = False
-                while i < len(self):
+                while i < len(self.items):
                     if arg.items[j][1] == self.items[i][1]:
                         self.items[i] = (i, arg.items[j][1], arg.items[j][2])
                         is_replaced = True
                     i += 1
                 if is_replaced == False:
-                    self.items.append((len(self), arg.items[j][1], arg.items[j][2]))
+                    self.items.append((len(self.items), arg.items[j][1], 
+                                       arg.items[j][2]))
                 j += 1
         else:
             len_arg = 1
-            self.items.append((len(self), str(len(self)), arg))
+            self.items.append((len(self.items), str(len(self.items)), arg))
         if len(argv) != 0:
             i = 0
             while i < len(argv):
                 if type(argv[i]) in (tuple, list):
-                    self.items.append((len(self), str(len(self)), argv[i]))
+                    self.items.append((len(self.items), str(len(self.items)), argv[i]))
                 elif type(argv[i]) is dict:
                     j = 0
                     while j < len(argv[i]):
                         k = 0
                         is_replaced = False
-                        while k < len(self):
-                            if str(tuple(argv[i].keys())[j]) == self.items[k][1]:
-                                self.items[k] = (k, str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j])
+                        argv_ij_key = str(tuple(argv[i].keys())[j])
+                        while k < len(self.items):
+                            if argv_ij_key == self.items[k][1]:
+                                self.items[k] = (k, argv_ij_key, 
+                                                 tuple(argv[i].values())[j])
                                 is_replaced = True
                             k += 1
                         if is_replaced == False:
-                            self.items.append((len(self), str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                            self.items.append((len(self.items), 
+                                               argv_ij_key, 
+                                               tuple(argv[i].values())[j]))
                         j += 1
                 elif type(argv[i]) is cdh:
                     j = 0
-                    while j < len(argv[i]):
+                    while j < len(argv[i].items):
                         k = 0
                         is_replaced = False
-                        while k < len(self):
+                        while k < len(self.items):
                             if argv[i].items[j][1] == self.items[k][1]:
-                                self.items[k] = (k, argv[i].items[j][1], argv[i].items[j][2])
+                                self.items[k] = (k, argv[i].items[j][1], 
+                                                 argv[i].items[j][2])
                                 is_replaced = True
                             k += 1
                         if is_replaced == False:
-                            self.items.append((len(self), argv[i].items[j][1], argv[i].items[j][2]))
+                            self.items.append((len(self.items), argv[i].items[j][1],
+                                               argv[i].items[j][2]))
                         j += 1
                 else:
-                    self.items.append((len(self), str(len(self)), argv[i]))
+                    self.items.append((len(self.items), str(len(self.items)), argv[i]))
                 i += 1
 
     # appends arg and argv as elements to a cdh. (can duplicate keys)
@@ -283,44 +314,49 @@ class cdh():
             pass
         elif type(arg) in (tuple, list):
             len_arg = 1
-            self.items.append((len(self), str(len(self)), arg))
+            self.items.append((len(self.items), str(len(self.items)), arg))
         elif type(arg) is dict:
             len_arg = len(arg)
             j = 0
             while j < len_arg:
-                self.items.append((len(self), str(tuple(arg.keys())[j]), tuple(arg.values())[j]))
+                self.items.append((len(self.items), str(tuple(arg.keys())[j]), 
+                                   tuple(arg.values())[j]))
                 j += 1
         elif type(arg) is cdh:
-            len_arg = len(arg)
+            len_arg = len(arg.items)
             j = 0
             while j < len_arg:
-                self.items.append((len(self), arg.items[j][1], arg.items[j][2]))
+                self.items.append((len(self.items), arg.items[j][1], 
+                                   arg.items[j][2]))
                 j += 1
         else:
             len_arg = 1
-            self.items.append((len(self), str(len(self)), arg))
+            self.items.append((len(self.items), str(len(self.items)), arg))
         if len(argv) != 0:
             i = 0
             while i < len(argv):
                 if type(argv[i]) in (tuple, list):
-                    self.items.append((len(self), str(len(self)), argv[i]))
+                    self.items.append((len(self.items), str(len(self.items)), argv[i]))
                 elif type(argv[i]) is dict:
                     j = 0
                     while j < len(argv[i]):
-                        self.items.append((len(self), str(tuple(argv[i].keys())[j]), tuple(argv[i].values())[j]))
+                        self.items.append((len(self.items), 
+                                           str(tuple(argv[i].keys())[j]), 
+                                           tuple(argv[i].values())[j]))
                         j += 1
                 elif type(argv[i]) is cdh:
                     j = 0
-                    while j < len(argv[i]):
-                        self.items.append((len(self), argv[i].items[j][1], argv[i].items[j][2]))
+                    while j < len(argv[i].items):
+                        self.items.append((len(self.items), argv[i].items[j][1], 
+                                           argv[i].items[j][2]))
                         j += 1
                 else:
-                    self.items.append((len(self), str(len(self)), argv[i]))
+                    self.items.append((len(self.items), str(len(self.items)), argv[i]))
                 i += 1
 
     # removes all elements from a cdh with index id, key or value.
     def pop(self, value, arg = None):
-        init_len_self = len(self)
+        init_len_self = len(self.items)
         if arg == 'id' or (type(value) == int and arg == None):
             try:
                 value = int(value)
@@ -338,30 +374,34 @@ class cdh():
         elif arg == 'val':
             k = 2
         else:
-            print('Invalid argument, can intersect on \'key\' or \'val\' only.')
+            print('Invalid argument, allowed \'key\' or \'val\' only.')
             exit(0)
         i = 0
-        while i < len(self):
+        while i < len(self.items):
             if value == self.items[i][k]:
                 self.items.pop(i)
-                if i != len(self):
+                if i != len(self.items)-1:
                     j = i
-                    while j < len(self):
-                        self.items[j] = (j, self.items[j][1], self.items[j][2])
+                    while j < len(self.items):
+                        self.items[j] = (j, self.items[j][1], 
+                                            self.items[j][2])
                         j += 1
+                i -= 1
             i += 1
-        if len(self) == init_len_self:
+        if len(self.items) == init_len_self:
             print('Invalid value or key in pop method.')
             exit(0)
 
-    # returns a cdh built with self and other elemenmt's. overlapping keys are not merged. (can duplicate keys)
+    # returns a cdh built with self and other elemenmt's. overlapping keys 
+    # are not merged. (can duplicate keys)
     def join(self, other):
         return_ch = cdh(self)
         if type(other) is cdh:
             i = 0
             j = len(return_ch)
             while i < len(other):
-                return_ch.items.append((j, other.items[i][1], other.items[i][2]))
+                return_ch.items.append((j, other.items[i][1], 
+                                        other.items[i][2]))
                 i += 1
                 j += 1
         else:
@@ -369,22 +409,25 @@ class cdh():
             exit(0)
         return return_ch
 
-    # returns a cdh built with self and other. overlapping keys are merged with other's value.
+    # returns a cdh built with self and other. overlapping keys are 
+    # merged with other's value.
     def merge(self, other):
         return_ch = cdh(self)
         if type(other) is cdh:
             i = 0
-            j = len(self)
+            j = len(self.items)
             while i < len(other):
                 k = 0
-                while k < len(self):
+                while k < len(self.items):
                     if other.items[i][1] == return_ch.items[k][1]:
-                        return_ch.items[k] = (k, other.items[i][1], other.items[i][2])
+                        return_ch.items[k] = (k, other.items[i][1], 
+                                              other.items[i][2])
                         k = -1
                         break
                     k += 1
                 if k != -1:
-                    return_ch.items.append((j, other.items[i][1], other.items[i][2]))
+                    return_ch.items.append((j, other.items[i][1], 
+                                            other.items[i][2]))
                     j += 1
                 i += 1
         else:
@@ -392,7 +435,8 @@ class cdh():
             exit(0)
         return return_ch
 
-    # returns a cdh built with elements of common keys or values (can duplicate keys)
+    # returns a cdh built with elements of common keys or values 
+    # (can duplicate keys)
     def common(self, other, arg = None):
         return_ch = cdh()
         if arg == 'key' or arg == None:
@@ -400,14 +444,15 @@ class cdh():
         elif arg == 'val':
             k = 2
         else:
-            print('Invalid argument, can intersect on \'key\' or \'val\' only.')
+            print('Invalid argument, allowed \'key\' or \'val\' only.')
         i = 0
         l = 0
-        while i < len(self):
+        while i < len(self.items):
             j = 0
             while j < len(other):
                 if self.items[i][k] == other.items[j][k]:
-                    return_ch.items.append((l, self.items[i][1], self.items[i][2]))
+                    return_ch.items.append((l, self.items[i][1], 
+                                            self.items[i][2]))
                     l += 1
                 j += 1
             i += 1
