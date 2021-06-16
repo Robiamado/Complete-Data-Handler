@@ -28,7 +28,7 @@ Complete data handler is a Python class that emulates dictionaries with list ind
 
 *- Using pip installer from “dist” folder:*
 
-pip install cdh\_main-2.0.1-py2.py3-none-any.whl
+pip install cdh\_main-2.0.3-py2.py3-none-any.whl
 
 *- Using source cdh\_main.py:*
 
