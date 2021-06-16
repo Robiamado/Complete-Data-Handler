@@ -15,7 +15,8 @@ Complete data handler is a Python class that emulates dictionaries with list ind
   - Removed get and set methods, aliasing is avoided using a new object instance.
   - Added append, join, merge, common methods on returning a cdh.
   - Added update, append, pop methods on modifying existing cdh.
-- 2.0.1 Fixed initialization indexing on multiple dicts or cdhs arguments
+- 2.0.1 
+	- Fixed initialization indexing on multiple dicts or cdhs arguments
 - 2.0.3
     - Optimized code
 	- Fixed pop method on duplicate keys
