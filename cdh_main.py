@@ -169,7 +169,7 @@ class cdh():
         if len(self.items) == len(other):
             for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], 
+                    return_cdh.append((i, self.items[i][1], 
                                        self.items[i][2] + other.items[i][2]))
                 except:
                     print('Error in cdh sum at id', i)
@@ -184,10 +184,10 @@ class cdh():
         if len(self.items) == len(other):
             for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], 
+                    return_cdh.append((i, self.items[i][1], 
                                        self.items[i][2] - other.items[i][2]))
                 except:
-                    print('Error in cdh subtract at id', i)
+                    print('Error in cdh subtraction at id', i)
                     exit(0)
         else:
             print('Error in subtract, cdhs of different length.')
@@ -199,10 +199,10 @@ class cdh():
         if len(self.items) == len(other):
             for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], 
+                    return_cdh.append((i, self.items[i][1], 
                                        self.items[i][2] * other.items[i][2]))
                 except:
-                    print('Error in cdh multiplicate at id', i)
+                    print('Error in cdh multiplication at id', i)
                     exit(0)
         else:
             print('Error in multiplicate, cdhs of different length.')
@@ -214,16 +214,39 @@ class cdh():
         if len(self.items) == len(other):
             for i in range(len(self.items)):
                 try:
-                    return_cdh.update((i, self.items[i][1], 
+                    return_cdh.append((i, self.items[i][1], 
                                        self.items[i][2] / other.items[i][2]))
                 except:
-                    print('Error in cdh divide at id', i)
+                    print('Error in cdh division at id', i)
                     exit(0)
         else:
             print('Error in division, cdhs of different length.')
             exit(0)
         return return_cdh
 
+    # return a list of IDs, Keys, Values
+    def ids(self):
+        i = 0
+        ids = []
+        while i < len(self.items):
+            ids.append(i)
+            i += 1
+        return ids
+    def keys(self):
+        i = 0
+        values = []
+        while i < len(self.items):
+            values.append(self.items[i][1])
+            i += 1
+        return values
+    def values(self):
+        i = 0
+        values = []
+        while i < len(self.items):
+            values.append(self.items[i][2])
+            i += 1
+        return values
+            
     # updates a cdh by adding as elements arg and argv. if arg or argv are 
     # dicts or chs replace same key's values.
     def update(self, arg = None, *argv):
