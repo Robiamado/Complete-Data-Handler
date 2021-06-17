@@ -20,6 +20,9 @@ Complete data handler is a Python class that emulates dictionaries with list ind
 - 2.0.3
     - Optimized code
 	- Fixed pop method on duplicate keys
+- 2.0.5
+	- Fixed duplicate keys overwrite on arithmetic operators
+	- Added ids(), keys(), values() getter methods.
 	
 ***Requirements***
 
@@ -29,7 +32,7 @@ Complete data handler is a Python class that emulates dictionaries with list ind
 
 *- Using pip installer from “dist” folder:*
 
-pip install cdh\_main-2.0.3-py2.py3-none-any.whl
+pip install cdh\_main-2.0.5-py2.py3-none-any.whl
 
 *- Using source cdh\_main.py:*
 
@@ -87,6 +90,9 @@ Note that slice indexing is transposed on mathematical notation where the slice 
 **\_\_add\_\_	\_\_sub\_\_	\_\_mult\_\_	\_\_truediv\_\_**
 
 These opeators return a cdh in which each element is the arithmetic operation of the two corresponding operands elements. For this reason both operands must be cdhs of same length.
+
+**ids	keys	values**
+Returns a list of cdh's ids, keys or values respectively.
 
 **update**
 
