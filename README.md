@@ -22,7 +22,7 @@ Complete data handler is a Python class that emulates dictionaries with list ind
 	- Fixed pop method on duplicate keys
 - 2.0.5
 	- Fixed duplicate keys overwrite on arithmetic operators
-	- Added ids(), keys(), values() getter methods.
+	- Added ids, keys, values getter methods.
 	
 ***Requirements***
 
