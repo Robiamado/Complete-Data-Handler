@@ -92,6 +92,7 @@ Note that slice indexing is transposed on mathematical notation where the slice 
 These opeators return a cdh in which each element is the arithmetic operation of the two corresponding operands elements. For this reason both operands must be cdhs of same length.
 
 **ids	keys	values**
+
 Returns a list of cdh's ids, keys or values respectively.
 
 **update**
