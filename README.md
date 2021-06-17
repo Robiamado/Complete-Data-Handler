@@ -46,7 +46,7 @@ from cdh\_main import cdh
 
 **\_\_init\_\_**
 
-Cdh objects can be created with more arguments. In the case of numbers, strings and lists each element given as argument gets added to the object istance using as key the ID converted to string. Example:
+Cdh objects can be created using one or more arguments. In the case of numbers, strings and lists each element given as argument gets added to the object istance using as key the ID converted to string. Example:
 
 a = cdh(1, 2) → a = {(0) 0 : 1, (1) 1 : 2}
 
