@@ -63,7 +63,8 @@ d = cdh({'zero' : 0, 1 : 'one'}, {'three' : 3}) → d = {(0) zero: 0, (1) 1: one
 
 e = cdh(d, {'a': 'b'}) → d = {(0) zero: 0, (1) 1: one, (2) three: 3, (3) a: b}
 
-**\_\_getitem\_\_   \_\_setitem\_\_**
+**\_\_getitem\_\_   
+\_\_setitem\_\_**
 
 Both used as square braket operator [ ] can be used in the most intuitive way, by calling it with an integer ID argument to read or modify the corresponding dictionary or using a string Key argument to read or modify the corresponding Value.
 
@@ -87,11 +88,16 @@ print(a) → {(0) 1: 1, (1) 2: 2}
 
 Note that slice indexing is transposed on mathematical notation where the slice starts and ends at the square brakets instructions’.
 
-**\_\_add\_\_	\_\_sub\_\_	\_\_mult\_\_	\_\_truediv\_\_**
+**\_\_add\_\_	
+\_\_sub\_\_	
+\_\_mult\_\_	
+\_\_truediv\_\_**
 
 These opeators return a cdh in which each element is the arithmetic operation of the two corresponding operands elements. For this reason both operands must be cdhs of same length.
 
-**ids	keys	values**
+**ids
+keys
+values**
 
 Returns a list of cdh's ids, keys or values respectively.
 
