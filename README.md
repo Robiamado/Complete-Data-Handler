@@ -1,10 +1,10 @@
-**Complete Data Handler**
+# Complete Data Handler
 
-***Introduction***
+## Introduction
 
 Complete data handler is a Python class that emulates dictionaries with list indexing, arithmetic operators, set theory operators.
 
-***Release Notes:***
+## Release Notes:
 
 - 1.0.0 Initial Release
 - 2.0.0 Lightweight Release
@@ -24,11 +24,11 @@ Complete data handler is a Python class that emulates dictionaries with list ind
 	- Fixed duplicate keys overwrite on arithmetic operators
 	- Added ids, keys, values getter methods.
 	
-***Requirements***
+## Requirements
 
 \- Python >=3.9
 
-***Install***
+## Install
 
 *- Using pip installer from “dist” folder:*
 
@@ -36,13 +36,13 @@ pip install cdh\_main-2.0.5-py2.py3-none-any.whl
 
 *- Using source cdh\_main.py:*
 
-copy cdh\_main.py in your root project folder
+copy cdh\_main.py in your root project folder and add _import cdh_main_ in .py source file.
 
 *-  Class import:*
 
 from cdh\_main import cdh
 
-***Methods***
+## Methods
 
 **\_\_init\_\_**
 
@@ -119,6 +119,6 @@ Returns a cdh buildt using the two arguments. Same keys’ values are chosen fro
 
 Returns a cdh buildt using common keys using ‘key’ as second argument, or common values using ‘val’ as second argument.
 
-
+## Contacts
 
 Please report any bugs at robiamado@gmail.com
