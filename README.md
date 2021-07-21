@@ -38,10 +38,6 @@ pip install cdh\_main-2.0.5-py2.py3-none-any.whl and add _from cdh_main import *
 
 copy cdh\_main.py in your root project folder and add _from cdh_main.py import *_ in .py source file.
 
-*-  Class import:*
-
-from cdh\_main import cdh
-
 ## Methods
 
 **\_\_init\_\_**
