@@ -32,11 +32,11 @@ Complete data handler is a Python class that emulates dictionaries with list ind
 
 *- Using pip installer from “dist” folder:*
 
-pip install cdh\_main-2.0.5-py2.py3-none-any.whl
+pip install cdh\_main-2.0.5-py2.py3-none-any.whl and add _from cdh_main import *_ in .py source file.
 
 *- Using source cdh\_main.py:*
 
-copy cdh\_main.py in your root project folder and add _import cdh_main_ in .py source file.
+copy cdh\_main.py in your root project folder and add _from cdh_main.py import *_ in .py source file.
 
 *-  Class import:*
 
