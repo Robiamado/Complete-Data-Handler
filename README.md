@@ -1,14 +1,16 @@
-**Complete Data Handler**
+# Complete Data Handler
 
-*Introduction*
+*_This version is outdated and no longer supported. Please consider using version 2.0 instead. This version is kept just for operators support management._*
+
+## Introduction
 
 Complete data handler is a Python class that merges numbers (int, float, complex), strings, lists and dictionaries. It can store and operate with those data types as a whole, using simple and intuitive rules listed below. CDH has been created to suppress the need of operating with dictionaries and lists as separate entities and to be able to call \_\_getitem\_\_ and \_\_setitem\_\_ operators (square brakets) with either an int, a slice or a string as argument. To do so, it has been introduced the concept of ID which is list indexing transposed to dictionaries. As matter of fact CDH structures store an ID, which is always a positive integer ; a Key, which is always a string, and a Value for each element. It has also been introduced a new set method, that allows to assign a number, string, list, dict or cdh to an existing cdh without aliasing. Recalling thet the latter is given by = operator. The new get method allows to retrive keys and values using IDs, pop method has been updated to handle IDs and a ro method is used to set a cdh to read only state. Union can be performed using update while intersection is done with common method, both save the result of the operation to the object calling it.
 
-*Requirements*
+## Requirements
 
 \- Python >=3.9
 
-*Install*
+## Install
 
 *- Using pip installer from “dist” folder:*
 
@@ -22,7 +24,7 @@ copy cdh\_main.py in your root project folder
 
 from cdh\_main import cdh
 
-*Methods*
+## Methods
 
 **\_\_init\_\_**
 
@@ -198,14 +200,13 @@ IF a.common(b, 'val') -> a = {(0) two: 1}
 
 This method sets the cdh to read only state, making it impossible to modify (if not through direct access).
 
-Release Notes:
+## Release Notes:
 
 - 1.0.0 Initial Release
 
-*Planned Features:*
+## Planned Features:
 
 - \_\_setitem\_\_ slice indexing
 - Numpy support
 - Operators on nested dictionaries and cdhs
 - Sorting algorithms
-
