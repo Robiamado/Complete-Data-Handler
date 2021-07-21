@@ -1,6 +1,6 @@
 # Complete Data Handler
 
-*_This version is outdated and no longer supported. Please consider using version 2.0 instead. This version is kept just for operators support management._*
+*_This version is outdated please consider using version 2+ instead. This version is kept just for operators support management._*
 
 ## Introduction
 
